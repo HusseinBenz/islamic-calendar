@@ -11,6 +11,17 @@ const I18N = (() => {
   const DICT = {
     en: {
       dir: 'ltr',
+      // Today & moon (Sakīna redesign)
+      todayLabel: 'Today',
+      appName: 'Islamic Calendar',
+      allProjects: 'All projects',
+      allProjectsAria: 'All Islamic projects',
+      ramadanTitle: 'Ramadan',
+      ramadanNow: 'Ramadan Mubarak',
+      daysToGo: (n) => n === 1 ? 'day to go' : 'days to go',
+      expected: 'Expected',
+      moonPhases: ['New crescent', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'],
+      moonLegend: 'Moon tonight',
       // Header
       headerSub: 'Sacred Days & Blessed Times',
       // Controls
@@ -66,17 +77,27 @@ const I18N = (() => {
       ahSuffix: 'AH',
       // Category labels
       cat: {
-        eid: '🎉 Celebration',
-        night: '🌙 Sacred Night',
-        fasting: '🌿 Fasting Day',
-        blessed: '🕋 Blessed Days',
-        historical: '📖 Historical',
-        weekly: '🕌 Weekly Sunnah',
+        eid: 'Celebration',
+        night: 'Sacred Night',
+        fasting: 'Fasting Day',
+        blessed: 'Blessed Days',
+        historical: 'Historical',
+        weekly: 'Weekly Sunnah',
       },
     },
 
     ar: {
       dir: 'rtl',
+      todayLabel: 'اليوم',
+      appName: 'التقويم الإسلامي',
+      allProjects: 'كل المشاريع',
+      allProjectsAria: 'كل المشاريع الإسلامية',
+      ramadanTitle: 'رمضان',
+      ramadanNow: 'رمضان مبارك',
+      daysToGo: (n) => n === 1 ? 'يوم متبقٍّ' : (n === 2 ? 'يومان متبقيان' : n <= 10 ? 'أيام متبقية' : 'يومًا متبقيًا'),
+      expected: 'المتوقع',
+      moonPhases: ['هلال أول الشهر', 'هلال متزايد', 'التربيع الأول', 'أحدب متزايد', 'بدر', 'أحدب متناقص', 'التربيع الأخير', 'هلال متناقص'],
+      moonLegend: 'القمر الليلة',
       headerSub: 'أيامٌ مباركة وأوقاتٌ فاضلة',
       themeToLight: 'الوضع الفاتح',
       themeToDark: 'الوضع الداكن',
@@ -122,12 +143,12 @@ const I18N = (() => {
       close: 'إغلاق',
       ahSuffix: 'هـ',
       cat: {
-        eid: '🎉 احتفال',
-        night: '🌙 ليلة مباركة',
-        fasting: '🌿 يوم صيام',
-        blessed: '🕋 أيام مباركة',
-        historical: '📖 حدث تاريخي',
-        weekly: '🕌 سُنّة أسبوعية',
+        eid: 'احتفال',
+        night: 'ليلة مباركة',
+        fasting: 'يوم صيام',
+        blessed: 'أيام مباركة',
+        historical: 'حدث تاريخي',
+        weekly: 'سُنّة أسبوعية',
       },
     },
   };

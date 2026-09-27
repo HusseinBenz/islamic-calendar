@@ -56,6 +56,7 @@ const App = (() => {
     $('viewYearBtn').addEventListener('click', () => setView('year'));
 
     $('themeToggle').addEventListener('click', toggleTheme);
+    document.addEventListener('sakina:theme', _updateThemeControl);
     $('langToggle').addEventListener('click', toggleLang);
 
     $('modalClose').addEventListener('click', closeModal);
@@ -63,18 +64,16 @@ const App = (() => {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
   }
 
-  // ── Theme ────────────────────────────────────────────────
+  // ── Theme (shared Sakīna day/night, remembered across all projects) ──
   function toggleTheme() {
-    theme = theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', theme);
-    try { localStorage.setItem('ic-theme', theme); } catch (_) {}
-    document.querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'dark' ? '#0a1722' : '#f1e7d0');
-    _updateThemeControl();
+    theme = window.Sakina ? Sakina.toggle() : (theme === 'dark' ? 'light' : 'dark');
+    if (!window.Sakina) document.documentElement.setAttribute('data-theme', theme);
   }
   function _updateThemeControl() {
     const btn = $('themeToggle');
-    $('themeIcon').textContent = theme === 'dark' ? '☀' : '☾';
+    btn.setAttribute('data-label-day', I18N.t('themeToLight'));
+    btn.setAttribute('data-label-night', I18N.t('themeToDark'));
+    theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
     btn.setAttribute('aria-label', I18N.t(theme === 'dark' ? 'themeToLight' : 'themeToDark'));
     btn.setAttribute('title', I18N.t(theme === 'dark' ? 'themeToLight' : 'themeToDark'));
   }
@@ -142,15 +141,21 @@ const App = (() => {
     $('langToggle').setAttribute('aria-label', I18N.t('langToggleAria'));
     $('langToggle').setAttribute('title', I18N.t('langToggleAria'));
 
-    // Nav button glyphs (point inward for the active direction)
-    const prevG = lang === 'ar' ? '›' : '‹';   // › : ‹
-    const nextG = lang === 'ar' ? '‹' : '›';
+    // Nav button chevrons (point outward for the active direction)
+    const left = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
+    const right = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+    const prevG = lang === 'ar' ? right : left;
+    const nextG = lang === 'ar' ? left : right;
     $('prevMonth').innerHTML = prevG; $('nextMonth').innerHTML = nextG;
     $('prevYear').innerHTML  = prevG; $('nextYear').innerHTML  = nextG;
     $('prevMonth').title = I18N.t('prevMonth'); $('nextMonth').title = I18N.t('nextMonth');
     $('prevYear').title  = I18N.t('prevYear');  $('nextYear').title  = I18N.t('nextYear');
+    $('prevMonth').setAttribute('aria-label', I18N.t('prevMonth')); $('nextMonth').setAttribute('aria-label', I18N.t('nextMonth'));
+    $('prevYear').setAttribute('aria-label', I18N.t('prevYear'));   $('nextYear').setAttribute('aria-label', I18N.t('nextYear'));
     $('btnToday').title = I18N.t('jumpToday');
-    $('btnThisYear').textContent = '⌂ ' + I18N.t('thisYear');
+    $('btnThisYear').textContent = I18N.t('thisYear');
+    $('projectsLabel').textContent = I18N.t('allProjects');
+    $('projectsLink').setAttribute('aria-label', I18N.t('allProjectsAria'));
 
     // Weekday header row
     _renderWeekdays();
@@ -174,7 +179,8 @@ const App = (() => {
     ];
     return items.map(([cat, key]) =>
       `<div class="legend-item"><span class="leg-dot cat-${cat}"></span>${I18N.t(key)}</div>`
-    ).join('');
+    ).join('') +
+      `<div class="legend-item legend-moon"><span class="sk-moon" style="--x:-6px"></span>${I18N.t('moonLegend')}</div>`;
   }
 
   function _sidebarTitleHTML(which) {
@@ -197,12 +203,76 @@ const App = (() => {
       todayHijri.year, todayHijri.month, todayHijri.day, todayGregorian.getDay()
     ).map(e => localizeEvent(e, lang));
 
-    let extra = '';
-    if (specials.length) extra = ` · ${specials[0].emoji} ${specials[0].name}`;
+    const gStr = fmtGreg(_toUTC(todayGregorian), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const m = MONTHS[todayHijri.month - 1];
+    const title = lang === 'ar'
+      ? `${I18N.num(todayHijri.day)} ${m.ar} <em>${I18N.num(todayHijri.year)}</em>`
+      : `${todayHijri.day} ${m.en} <em>${todayHijri.year}</em>`;
+    const sub = lang === 'ar'
+      ? `${todayHijri.day} ${m.en} ${todayHijri.year} AH`
+      : `${I18N.toArabic(todayHijri.day)} ${m.ar} ${I18N.toArabic(todayHijri.year)} هـ`;
+    const chips = specials.map(e =>
+      `<button type="button" class="sk-tag today-chip cat-soft-${e.category}" data-today-event="${e.id}">${e.shortName || e.name}</button>`
+    ).join('');
 
-    const gStr = fmtGreg(_toUTC(todayGregorian), { day: 'numeric', month: 'long', year: 'numeric' });
-    const label = lang === 'ar' ? 'اليوم' : 'Today';
-    banner.innerHTML = `${label}: <strong>${fmtHijri(todayHijri)}</strong> / ${gStr}${extra}`;
+    const ramadan = _nextRamadan();
+    let ramadanHTML = '';
+    if (ramadan && ramadan.now) {
+      ramadanHTML = `<div class="ramadan sk-card"><div class="ramadan__top"><span class="sk-eyebrow">${I18N.t('ramadanTitle')} ${I18N.num(todayHijri.year)}</span>${LANTERN}</div>
+        <div class="ramadan__count"><span class="sk-display">${I18N.t('ramadanNow')}</span></div></div>`;
+    } else if (ramadan) {
+      const expected = fmtGreg(ramadan.gregorian, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      ramadanHTML = `<div class="ramadan sk-card"><div class="ramadan__top"><span class="sk-eyebrow">${I18N.t('ramadanTitle')} ${I18N.num(ramadan.hijriYear)}</span>${LANTERN}</div>
+        <div class="ramadan__count"><span class="sk-display">${I18N.num(ramadan.days)}</span><span>${I18N.t('daysToGo')(ramadan.days)}</span></div>
+        <span class="ramadan__date">${I18N.t('expected')}: ${expected}</span></div>`;
+    }
+
+    banner.innerHTML = `
+      <div class="today__main">
+        <span class="sk-eyebrow">${I18N.t('todayLabel')} · ${gStr}</span>
+        <h1 class="sk-display today__title">${title}</h1>
+        <span class="today__sub" ${lang === 'ar' ? 'lang="en" dir="ltr"' : 'lang="ar" dir="rtl"'}>${sub}</span>
+        ${chips ? `<div class="today__chips">${chips}</div>` : ''}
+      </div>
+      <div class="today__side">
+        ${ramadanHTML}
+        <div class="today__moon sk-arch" aria-label="${_phaseName(todayHijri.day)}">
+          <i class="sk-twinkle" style="left:20%;top:23%"></i><i class="sk-twinkle" style="left:74%;top:33%;animation-delay:1.2s"></i><i class="sk-twinkle" style="left:30%;top:55%;animation-delay:.6s"></i>
+          <span class="sk-moon today__moon-disc" style="--x:${_moonX(todayHijri.day, 60)}"></span>
+          <span class="today__moon-name">${_phaseName(todayHijri.day)}</span>
+        </div>
+      </div>`;
+
+    banner.querySelectorAll('[data-today-event]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const raw = getSpecialDaysFor(todayHijri.year, todayHijri.month, todayHijri.day, todayGregorian.getDay());
+        openModal(raw, todayHijri, _toUTC(todayGregorian));
+      });
+    });
+  }
+
+  const LANTERN = '<svg class="sk-swing" width="26" height="30" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v3"/><path d="M9 4h6"/><path d="M8 4 6.5 8h11L16 4"/><path d="M6.5 8C5 12 5 17 6.5 21h11c1.5-4 1.5-9 0-13"/><path d="M12 10.5c-1.6 1.7-1.6 5.3 0 7 1.6-1.7 1.6-5.3 0-7Z" fill="currentColor" opacity=".55"/><path d="m6.5 21 1.5 3h8l1.5-3"/></svg>';
+
+  // Moon glyph: offset of the lit inset shadow for a Hijri day (waxing lit on the right)
+  function _moonX(day, size) {
+    const x = day <= 15 ? -Math.round(size * day / 15) : Math.round(size * (30 - day) / 15);
+    return x + 'px';
+  }
+  function _phaseName(day) {
+    const i = day <= 3 ? 0 : day <= 6 ? 1 : day <= 8 ? 2 : day <= 13 ? 3 : day <= 15 ? 4 : day <= 21 ? 5 : day <= 23 ? 6 : 7;
+    return I18N.t('moonPhases')[i];
+  }
+
+  // Walk forward through the Umm al-Qura calendar to the next 1 Ramadan
+  function _nextRamadan() {
+    if (todayHijri.month === 9) return { now: true };
+    for (let i = 1; i <= 400; i++) {
+      const local = new Date(todayGregorian.getFullYear(), todayGregorian.getMonth(), todayGregorian.getDate() + i);
+      const g = new Date(Date.UTC(local.getFullYear(), local.getMonth(), local.getDate(), 12));
+      const h = HijriCalendar.fromGregorian(g);
+      if (h.month === 9 && h.day === 1) return { days: i, gregorian: g, hijriYear: h.year };
+    }
+    return null;
   }
 
   function _toUTC(d) {
@@ -271,10 +341,17 @@ const App = (() => {
     const labelText = primary ? (primary.shortName || '') : '';
 
     cell.innerHTML = `
-      <div class="day-hijri">${I18N.num(hijri.day)}</div>
-      <div class="day-gregorian">${I18N.num(gregorian.getUTCDate())}</div>
-      ${dotHTML ? `<div class="day-dots">${dotHTML}</div>` : ''}
-      ${labelText ? `<div class="day-label">${labelText}</div>` : ''}`;
+      <div class="day-top">
+        <div class="day-hijri">${I18N.num(hijri.day)}</div>
+        <span class="sk-moon day-moon" style="--x:${_moonX(hijri.day, 14)}" title="${_phaseName(hijri.day)}"></span>
+      </div>
+      ${labelText ? `<div class="day-label cat-soft-${specials[0].category}">${labelText}</div>` : ''}
+      <div class="day-bottom">
+        <div class="day-gregorian">${I18N.num(gregorian.getUTCDate())}</div>
+        ${dotHTML ? `<div class="day-dots">${dotHTML}</div>` : ''}
+      </div>`;
+    const gLong = fmtGreg(gregorian, { weekday: 'long', day: 'numeric', month: 'long' });
+    cell.setAttribute('aria-label', `${fmtHijri(hijri)} · ${gLong}${primary ? ' · ' + (primary.shortName || primary.name) : ''}`);
 
     if (specials.length) {
       cell.setAttribute('role', 'button');
@@ -319,7 +396,7 @@ const App = (() => {
       .map(e => `
         <span class="month-tag">
           <span class="month-tag-dot" style="background:${CAT_COLORS[e.category]}"></span>
-          ${e.emoji} ${e.shortName}
+          ${e.shortName}
         </span>`)
       .join('');
 
@@ -369,11 +446,11 @@ const App = (() => {
     const gStr = fmtGreg(gregorian, { day: 'numeric', month: 'short' });
     const countText = daysUntil === 1 ? I18N.t('tomorrow') : I18N.t('inDays')(daysUntil);
     const secondary = lang === 'ar'
-      ? `<div class="upcoming-name">${ev.emoji} ${ev.shortName}</div>`
-      : `<div class="upcoming-name">${ev.emoji} ${ev.name}</div>`;
+      ? `<div class="upcoming-name">${ev.shortName}</div>`
+      : `<div class="upcoming-name">${ev.name}</div>`;
 
     item.innerHTML = `
-      <span class="upcoming-dot" style="background:${CAT_COLORS[event.category]}"></span>
+      <span class="upcoming-dot cat-soft-${event.category}"><span style="background:${CAT_COLORS[event.category]}"></span></span>
       <div class="upcoming-info">
         <div class="upcoming-ar">${event.arabicName}</div>
         ${secondary}
@@ -399,11 +476,11 @@ const App = (() => {
     if (!el) return;
     el.innerHTML = `
       <div class="weekly-item">
-        <span class="weekly-icon">🕌</span>
+        <span class="weekly-icon" style="background:var(--weekly)"></span>
         <div><strong>${I18N.t('fridayName')}</strong><span>${I18N.t('fridayDesc')}</span></div>
       </div>
       <div class="weekly-item">
-        <span class="weekly-icon">🌿</span>
+        <span class="weekly-icon" style="background:var(--fasting)"></span>
         <div><strong>${I18N.t('monThuName')}</strong><span>${I18N.t('monThuDesc')}</span></div>
       </div>`;
   }
@@ -570,7 +647,7 @@ const App = (() => {
       chipsHTML = `<div class="mc-events-strip">
         ${events.map((e, i) => `
           <button class="mc-event-chip ${i === 0 ? 'active' : ''}" type="button">
-            ${e.emoji} ${e.shortName || e.name}
+            ${e.shortName || e.name}
           </button>`).join('')}
       </div>`;
       panelsHTML = events.map((e, i) => `
@@ -587,11 +664,11 @@ const App = (() => {
 
     return `
       <div class="mc-header">
-        <span class="mc-emoji">${primary.emoji}</span>
+        <span class="mc-emoji sk-arch" style="color:${badgeColor}" aria-hidden="true"><svg width="26" height="26" viewBox="-12 -12 24 24"><path fill="currentColor" d="M11 0L7.78 3.22L7.78 7.78L3.22 7.78L0 11L-3.22 7.78L-7.78 7.78L-7.78 3.22L-11 0L-7.78 -3.22L-7.78 -7.78L-3.22 -7.78L0 -11L3.22 -7.78L7.78 -7.78L7.78 -3.22Z"/></svg></span>
         <span class="mc-arabic-name">${primary.arabicName}</span>
         ${nameLine}
         <div class="mc-date-line">${hijriStr} &nbsp;·&nbsp; ${gStr}</div>
-        <span class="mc-badge" style="background:${badgeColor}22;color:${badgeColor};border:1px solid ${badgeColor}55">
+        <span class="mc-badge cat-soft-${primary.category}">
           ${I18N.t('cat.' + primary.category)}
         </span>
       </div>
@@ -609,7 +686,7 @@ const App = (() => {
     if (evt.virtues?.length) {
       html += `
         <div class="mc-section">
-          <div class="mc-section-title">✦ ${I18N.t('secVirtues')}</div>
+          <div class="mc-section-title">${I18N.t('secVirtues')}</div>
           <ul class="mc-virtues">${evt.virtues.map(v => `<li>${v}</li>`).join('')}</ul>
         </div>`;
     }
@@ -617,7 +694,7 @@ const App = (() => {
     if (evt.hadiths?.length) {
       html += `
         <div class="mc-section">
-          <div class="mc-section-title">📜 ${I18N.t('secHadith')}</div>
+          <div class="mc-section-title">${I18N.t('secHadith')}</div>
           ${evt.hadiths.map(h => _hadithHTML(h)).join('')}
         </div>`;
     }
@@ -625,7 +702,7 @@ const App = (() => {
     if (evt.ayahs?.length) {
       html += `
         <div class="mc-section">
-          <div class="mc-section-title">📖 ${I18N.t('secAyah')}</div>
+          <div class="mc-section-title">${I18N.t('secAyah')}</div>
           ${evt.ayahs.map(a => _ayahHTML(a)).join('')}
         </div>`;
     }
@@ -633,7 +710,7 @@ const App = (() => {
     if (evt.recommendations?.length) {
       html += `
         <div class="mc-section">
-          <div class="mc-section-title">🌿 ${I18N.t('secDo')}</div>
+          <div class="mc-section-title">${I18N.t('secDo')}</div>
           <div class="mc-recs">${evt.recommendations.map(r => `<div class="mc-rec">${r}</div>`).join('')}</div>
         </div>`;
     }
