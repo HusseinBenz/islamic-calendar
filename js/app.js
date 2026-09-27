@@ -58,6 +58,8 @@ const App = (() => {
     // The theme button carries data-sk-theme-toggle, so sakina.js flips the theme;
     // here we only refresh its translated label afterwards.
     document.addEventListener('sakina:theme', _updateThemeControl);
+    // Switching between 123 and ١٢٣ redraws everything with the new digits
+    document.addEventListener('sakina:digits', () => { applyI18n(); renderAll(); });
     $('langToggle').addEventListener('click', toggleLang);
 
     $('modalClose').addEventListener('click', closeModal);
@@ -118,7 +120,7 @@ const App = (() => {
     if (lang === 'ar') return `${mn.ar} ${I18N.num(y)} هـ`;
     return `${mn.en} ${y} AH`;
   }
-  function gregLocale() { return lang === 'ar' ? 'ar' : 'en-GB'; }
+  function gregLocale() { return lang === 'ar' ? (window.Sakina && Sakina.digits() === 'arab' ? 'ar' : 'ar-u-nu-latn') : 'en-GB'; }
   function fmtGreg(date, opts) {
     return date.toLocaleDateString(gregLocale(), Object.assign({ timeZone: 'UTC' }, opts));
   }
@@ -208,7 +210,7 @@ const App = (() => {
       : `${todayHijri.day} ${m.en} <em>${todayHijri.year}</em>`;
     const sub = lang === 'ar'
       ? `${todayHijri.day} ${m.en} ${todayHijri.year} AH`
-      : `${I18N.toArabic(todayHijri.day)} ${m.ar} ${I18N.toArabic(todayHijri.year)} هـ`;
+      : `${Sakina.numAr(todayHijri.day)} ${m.ar} ${Sakina.numAr(todayHijri.year)} هـ`;
     const chips = specials.map(e =>
       `<button type="button" class="sk-tag today-chip cat-soft-${e.category}" data-today-event="${e.id}">${e.shortName || e.name}</button>`
     ).join('');

@@ -132,7 +132,7 @@ const I18N = (() => {
       monthEmpty: 'شهرٌ للمداومة على الأعمال الصالحة والاستعداد لما هو آتٍ.',
       upcomingEmpty: 'لا توجد مناسبات كبرى خلال التسعين يومًا القادمة.',
       tomorrow: 'غدًا',
-      inDays: (n) => `بعد ${toArabic(n)} ${n === 2 ? 'يومين' : n <= 10 ? 'أيام' : 'يومًا'}`,
+      inDays: (n) => `بعد ${num(n)} ${n === 2 ? 'يومين' : n <= 10 ? 'أيام' : 'يومًا'}`,
       disclaimer: 'التواريخ وفق تقويم أم القرى (المملكة العربية السعودية) وقد تختلف بمقدار ±يوم واحد عن رؤية الهلال المحلية. يبدأ اليوم الإسلامي عند <em>غروب الشمس</em> لا منتصف الليل.',
       notice: 'قد لا يدعم متصفحك التقويم الإسلامي بالكامل. التواريخ المعروضة تقريبية.',
       secAbout: 'نبذة',
@@ -175,8 +175,10 @@ const I18N = (() => {
   }
 
   // Render a number in the active language's numeral system
+  // Arabic uses ordinary digits (123) unless the reader chose Arabic-Indic (١٢٣)
   function num(value) {
-    return _lang === 'ar' ? toArabic(value) : String(value);
+    if (_lang !== 'ar') return String(value);
+    return window.Sakina ? Sakina.numAr(value) : String(value);
   }
 
   return { setLang, getLang, isRTL, t, num, toArabic, DICT };
