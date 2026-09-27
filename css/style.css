@@ -20,7 +20,6 @@
 .cat-soft-historical { background: var(--cal-soft); color: var(--cal); }
 .cat-soft-weekly { background: var(--adhan-soft); color: var(--adhan); }
 
-[dir="rtl"] body { font-family: "Reem Kufi", var(--font-naskh), var(--font-ui); }
 .ar-label { display: block; }
 
 .cal-page { display: flex; flex-direction: column; gap: 28px; padding-top: clamp(16px, 3vw, 28px); }
@@ -33,8 +32,8 @@
 .seg-btn { min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--text-2); font: 600 14px/1 var(--font-ui); transition: background-color .2s, color .2s, box-shadow .2s; }
 .seg-btn:hover { color: var(--text); }
 .seg-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
-[dir="rtl"] .seg-btn { font-family: var(--font-kufi); }
-.lang-btn #langLabel { font-family: var(--font-kufi); font-size: 15px; }
+[dir="rtl"] .seg-btn { font-family: var(--font-ar-ui); }
+.lang-btn #langLabel { font-family: var(--font-ar-ui); font-size: 15px; font-weight: 600; }
 [dir="rtl"] .lang-btn #langLabel { font-family: var(--font-ui); font-size: 14px; }
 
 /* ── Today ─────────────────────────────────────────────── */
@@ -42,7 +41,7 @@
 .today__main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .today__title { font-size: clamp(42px, 6vw, 76px); }
 .today__title em { color: var(--accent); }
-.today__sub { align-self: flex-start; font-family: var(--font-kufi); font-size: clamp(18px, 2vw, 24px); color: var(--gold); }
+.today__sub { align-self: flex-start; font-family: var(--font-ar-ui); font-weight: 600; font-size: clamp(18px, 2vw, 24px); color: var(--gold); }
 .today__sub[lang="en"] { font-family: var(--font-display); }
 .today__chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .today-chip { border: 0; cursor: pointer; min-height: 30px; }
@@ -90,7 +89,7 @@
 .cal-weekdays, .cal-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
 .wd { padding: 4px 12px; font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
 .wd.fri { color: var(--weekly); }
-[dir="rtl"] .wd { letter-spacing: 0; text-transform: none; font-family: var(--font-kufi); font-size: 13.5px; }
+[dir="rtl"] .wd { letter-spacing: 0; text-transform: none; font-family: var(--font-ar-ui); font-size: 13.5px; }
 
 .day-cell {
   position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;
@@ -107,7 +106,7 @@
 .day-cell.is-today .day-hijri { color: var(--primary); }
 .day-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
 .day-hijri { font-size: 22px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-[dir="rtl"] .day-hijri { font-family: var(--font-kufi); font-weight: 600; }
+[dir="rtl"] .day-hijri { font-family: var(--font-ar-ui); font-weight: 700; }
 .day-moon { width: 14px; height: 14px; margin-top: 2px; }
 .day-label { align-self: flex-start; max-width: 100%; padding: 3px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .day-bottom { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
@@ -122,10 +121,10 @@
 .sidebar-card { padding: 22px; border-radius: 28px; display: flex; flex-direction: column; gap: 12px; }
 .sidebar-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 17px; font-weight: 700; }
 .sidebar-title > span:first-child, .sidebar-title .ar-label { display: inline; }
-.sidebar-title { font-family: var(--font-kufi); font-weight: 500; font-size: 14px; color: var(--text-3); }
+.sidebar-title { font-family: var(--font-ar-ui); font-weight: 500; font-size: 14px; color: var(--text-3); }
 .sidebar-title .ar-label { font-family: var(--font-ui); font-weight: 700; font-size: 17px; color: var(--text); }
 [dir="rtl"] .sidebar-title { font-family: var(--font-ui); font-weight: 500; }
-[dir="rtl"] .sidebar-title .ar-label { font-family: var(--font-kufi); font-weight: 600; }
+[dir="rtl"] .sidebar-title .ar-label { font-family: var(--font-ar-ui); font-weight: 700; }
 .upcoming-list { display: flex; flex-direction: column; gap: 2px; margin-inline: -10px; }
 .upcoming-empty { margin: 0; padding: 0 10px; font-size: 14px; color: var(--text-3); }
 .upcoming-item { display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 16px; cursor: pointer; transition: background-color .2s; }
@@ -133,7 +132,7 @@
 .upcoming-dot { width: 36px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 999px 999px 10px 10px; }
 .upcoming-dot > span { width: 12px; height: 12px; border-radius: 50%; }
 .upcoming-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.upcoming-ar { font-family: var(--font-naskh); font-size: 16px; line-height: 1.5; color: var(--gold); }
+.upcoming-ar { font-family: var(--font-ar-ui); font-weight: 600; font-size: 15px; line-height: 1.6; color: var(--gold); }
 .upcoming-name { font-size: 15px; font-weight: 600; line-height: 1.35; }
 .upcoming-date { font-size: 12.5px; color: var(--text-3); }
 .upcoming-countdown { flex: none; padding: 4px 10px; border-radius: 999px; background: var(--sunk); font-size: 12px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
@@ -143,7 +142,7 @@
 .weekly-item strong { display: block; font-size: 15px; }
 .weekly-item span { display: block; font-size: 14px; line-height: 1.55; color: var(--text-2); }
 .month-title { margin: 0; font-family: var(--font-display); font-size: 26px; line-height: 1.1; }
-[dir="rtl"] .month-title { font-family: var(--font-kufi); }
+[dir="rtl"] .month-title { font-family: var(--font-ar-ui); font-weight: 700; font-size: 22px; line-height: 1.4; }
 .month-body { margin: 0; font-size: 14px; color: var(--text-2); }
 .month-highlights { display: flex; flex-wrap: wrap; gap: 8px; }
 .month-tag { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; background: var(--sunk); font-size: 13px; font-weight: 600; }
@@ -160,9 +159,9 @@
 .year-col.is-current-month { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
 .yc-head { position: sticky; top: 0; z-index: 1; padding: 12px 12px 10px; background: var(--surface-2); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 1px; }
 .yc-month-ar { font-family: var(--font-display); font-size: 21px; line-height: 1.15; }
-[dir="rtl"] .yc-month-ar { font-family: var(--font-kufi); font-size: 18px; }
+[dir="rtl"] .yc-month-ar { font-family: var(--font-ar-ui); font-weight: 700; font-size: 17px; line-height: 1.4; }
 .yc-month-en { font-size: 12.5px; font-weight: 600; color: var(--text-2); }
-.yc-month-en.yc-sec-ar { font-family: var(--font-kufi); font-weight: 500; color: var(--gold); }
+.yc-month-en.yc-sec-ar { font-family: var(--font-ar-ui); font-weight: 600; color: var(--gold); }
 .yc-greg { font-size: 11.5px; color: var(--text-3); }
 .yc-days { display: flex; flex-direction: column; gap: 2px; padding: 6px; overflow-y: auto; }
 .yc-day { display: grid; grid-template-columns: 2.6ch 1fr auto; align-items: center; gap: 4px; min-height: 26px; padding: 3px 6px; border-radius: 8px; font-size: 12.5px; border: 1px solid transparent; }
@@ -212,16 +211,16 @@
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24'%3E%3Cpath d='M11 0L7.78 3.22L7.78 7.78L3.22 7.78L0 11L-3.22 7.78L-7.78 7.78L-7.78 3.22L-11 0L-7.78 -3.22L-7.78 -7.78L-3.22 -7.78L0 -11L3.22 -7.78L7.78 -7.78L7.78 -3.22Z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 .mc-section-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-[dir="rtl"] .mc-section-title { letter-spacing: 0; font-family: var(--font-kufi); font-size: 14px; text-transform: none; }
+[dir="rtl"] .mc-section-title { letter-spacing: 0; font-family: var(--font-ar-ui); font-size: 14.5px; text-transform: none; }
 .mc-desc { margin: 0; font-size: 16px; line-height: 1.75; color: var(--text-2); }
-[dir="rtl"] .mc-desc { font-family: var(--font-naskh); font-size: 18px; line-height: 1.9; }
+[dir="rtl"] .mc-desc { font-family: var(--font-ar-text); font-size: 18px; line-height: 1.95; }
 .mc-virtues { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .mc-virtues li { position: relative; padding-inline-start: 22px; font-size: 15px; line-height: 1.6; color: var(--text-2); }
 .mc-virtues li::before { content: ""; position: absolute; inset-inline-start: 2px; top: 9px; width: 7px; height: 7px; border-radius: 2px; transform: rotate(45deg); background: var(--gold-bright); }
 .hadith-card, .ayah-card { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--line); }
 .hadith-arabic, .ayah-arabic { display: block; font-family: var(--font-naskh); font-size: 22px; line-height: 2; color: var(--gold); text-align: right; direction: rtl; }
 .hadith-text { font-family: var(--font-display); font-size: 21px; line-height: 1.35; color: var(--text); }
-[dir="rtl"] .hadith-text { font-family: var(--font-naskh); font-size: 18px; line-height: 1.9; }
+[dir="rtl"] .hadith-text { font-family: var(--font-naskh); font-size: 21px; line-height: 1.9; }
 .hadith-meta { display: flex; flex-wrap: wrap; gap: 8px; }
 .source-tag, .narrator-tag { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
 .source-tag { background: var(--primary-soft); color: var(--primary); }
@@ -273,3 +272,6 @@
   #projectsLink { display: none; }
   .lang-btn { padding: 0 10px; }
 }
+
+[dir="rtl"] .mc-virtues li, [dir="rtl"] .mc-rec, [dir="rtl"] .mc-note, [dir="rtl"] .weekly-item span, [dir="rtl"] .month-body, [dir="rtl"] .cal-disclaimer { font-family: var(--font-ar-text); line-height: 1.9; }
+[dir="rtl"] .mc-name, [dir="rtl"] .month-title, [dir="rtl"] .yc-month-ar { font-family: var(--font-ar-text); }

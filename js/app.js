@@ -55,7 +55,8 @@ const App = (() => {
     $('viewMonthBtn').addEventListener('click', () => setView('month'));
     $('viewYearBtn').addEventListener('click', () => setView('year'));
 
-    $('themeToggle').addEventListener('click', toggleTheme);
+    // The theme button carries data-sk-theme-toggle, so sakina.js flips the theme;
+    // here we only refresh its translated label afterwards.
     document.addEventListener('sakina:theme', _updateThemeControl);
     $('langToggle').addEventListener('click', toggleLang);
 
@@ -65,10 +66,6 @@ const App = (() => {
   }
 
   // ── Theme (shared Sakīna day/night, remembered across all projects) ──
-  function toggleTheme() {
-    theme = window.Sakina ? Sakina.toggle() : (theme === 'dark' ? 'light' : 'dark');
-    if (!window.Sakina) document.documentElement.setAttribute('data-theme', theme);
-  }
   function _updateThemeControl() {
     const btn = $('themeToggle');
     btn.setAttribute('data-label-day', I18N.t('themeToLight'));
@@ -84,7 +81,8 @@ const App = (() => {
     I18N.setLang(lang);
     document.documentElement.setAttribute('lang', lang);
     document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-    try { localStorage.setItem('ic-lang', lang); } catch (_) {}
+    document.documentElement.setAttribute('data-lang', lang);
+    try { localStorage.setItem('ic-lang', lang); localStorage.setItem('sakina-lang', lang); } catch (_) {}
     applyI18n();
     renderAll();
   }

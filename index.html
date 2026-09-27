@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -14,9 +14,10 @@
         var t = localStorage.getItem('sakina-theme') || localStorage.getItem('ic-theme');
         if (t !== 'light' && t !== 'dark') t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', t);
-        var l = localStorage.getItem('ic-lang') || 'en';
+        var l = localStorage.getItem('sakina-lang') || localStorage.getItem('ic-lang') || 'en';
         document.documentElement.setAttribute('lang', l);
         document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+        document.documentElement.setAttribute('data-lang', l === 'ar' ? 'ar' : 'en');
       } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
     })();
   </script>
@@ -24,9 +25,9 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%233456C8' d='M23 12L19.78 15.22L19.78 19.78L15.22 19.78L12 23L8.78 19.78L4.22 19.78L4.22 15.22L1 12L4.22 8.78L4.22 4.22L8.78 4.22L12 1L15.22 4.22L19.78 4.22L19.78 8.78Z'/%3E%3Ccircle cx='12' cy='12' r='4.4' fill='%23F6F4EE'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Instrument+Serif:ital@0;1&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/sakina.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/sakina.css?v=sk2">
+  <link rel="stylesheet" href="css/style.css?v=sk2">
 </head>
 <body class="sk-project-cal">
   <a class="sk-skip" href="#appMain">Skip to calendar</a>
@@ -37,7 +38,7 @@
     <div class="sk-container sk-header__inner">
       <a class="sk-brand" href="./">
         <span class="sk-tile sk-tile--sm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 2v4M17 4h4"/></svg></span>
-        <span class="sk-brand__text"><span class="sk-brand__name" lang="en">Islamic Calendar</span><span class="sk-brand__sub" lang="ar">التقويم الإسلامي</span></span>
+        <span class="sk-brand__text"><span class="sk-brand__name"><span class="en">Islamic Calendar</span><span class="ar">التقويم الإسلامي</span></span><span class="sk-brand__sub"><span class="en" lang="ar">التقويم الإسلامي</span><span class="ar" lang="en">Islamic Calendar</span></span></span>
       </a>
       <nav class="sk-header__nav app-controls" aria-label="Calendar controls">
         <div class="view-switch" role="tablist" aria-label="Calendar view">
@@ -127,10 +128,10 @@
 
   <footer class="sk-footer">
     <div class="sk-container sk-footer__inner">
-      <p lang="en">Umm al-Qura calculation · English / <span lang="ar">العربية</span> · Day &amp; Night</p>
+      <p><span class="en">Umm al-Qura calculation · English / <span lang="ar">العربية</span> · Day &amp; Night</span><span class="ar">حساب أم القرى · العربية / <span lang="en">English</span> · نهاري وليلي</span></p>
       <a class="sk-footer__home" href="https://husseinbenz.github.io/islamic-projects/">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path style="fill:var(--primary)" d="M23 12L19.78 15.22L19.78 19.78L15.22 19.78L12 23L8.78 19.78L4.22 19.78L4.22 15.22L1 12L4.22 8.78L4.22 4.22L8.78 4.22L12 1L15.22 4.22L19.78 4.22L19.78 8.78Z"/><circle cx="12" cy="12" r="4.4" style="fill:var(--bg)"/></svg>
-        Part of Islamic Projects</a>
+        <span class="en">Part of Islamic Projects</span><span class="ar">من المشاريع الإسلامية</span></a>
     </div>
   </footer>
 
@@ -144,10 +145,10 @@
     </div>
   </div>
 
-  <script src="js/sakina.js"></script>
-  <script src="js/hijri.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/sakina.js?v=sk2"></script>
+  <script src="js/hijri.js?v=sk2"></script>
+  <script src="js/i18n.js?v=sk2"></script>
+  <script src="js/data.js?v=sk2"></script>
+  <script src="js/app.js?v=sk2"></script>
 </body>
 </html>
